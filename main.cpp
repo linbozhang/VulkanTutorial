@@ -64,6 +64,7 @@ private:
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 	VkDevice device;
+	VkQueue graphicsQueue;
 	VkDebugUtilsMessengerEXT debugMessenger;
 	
 	
@@ -179,6 +180,7 @@ private:
 		createInstance();
 		setupDebugMessenger();
 		pickPhysicalDevice();
+		createLogicalDevice();
 	}
 	void createLogicalDevice()
 	{
@@ -202,6 +204,7 @@ private:
 		{
 			throw std::runtime_error("failed to create logicaldevice");
 		}
+		vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	}
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
 	{
