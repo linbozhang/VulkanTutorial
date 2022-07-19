@@ -74,9 +74,10 @@ private:
 	struct QueueFamilyIndices
 	{
 		std::optional<uint32_t> graphicsFamily;
+		std::optional<uint32_t> presentFamily;
 		bool isComplete()
 		{
-			return graphicsFamily.has_value();
+			return graphicsFamily.has_value() && presentFamily.has_value();
 		}
 	};
 	void initWindow()
@@ -226,9 +227,6 @@ private:
 	QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice device)
 	{
 		QueueFamilyIndices indices;
-		/*std::optional<uint32_t> graphicsFamily;
-		std::cout << std::boolalpha << graphicsFamily.has_value() << std::endl;
-		graphicsFamily = 0;*/
 		uint32_t queueFamilyCount = 0;
 		vkGetPhysicalDeviceQueueFamilyProperties(device, &queueFamilyCount, nullptr);
 		std::vector<VkQueueFamilyProperties> queueFamilies(queueFamilyCount);
@@ -239,6 +237,12 @@ private:
 			if (queueFamily.queueFlags&VK_QUEUE_GRAPHICS_BIT)
 			{
 				indices.graphicsFamily = i;
+			}
+			VkBool32 presentSupport = false;
+			vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+			if(presentSupport)
+			{
+				indices.presentFamily = i;
 			}
 			if (indices.isComplete())
 			{
