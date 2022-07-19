@@ -67,6 +67,7 @@ private:
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 	VkDevice logicalDevice = nullptr;
 	VkQueue graphicsQueue = nullptr;
+	VkSurfaceKHR surface;
 	VkDebugUtilsMessengerEXT debugMessenger = nullptr;
 
 
@@ -185,8 +186,16 @@ private:
 	{
 		createInstance();
 		setupDebugMessenger();
+		createSurface();
 		pickPhysicalDevice();
 		createLogicalDevice();
+	}
+	void createSurface()
+	{
+		if(glfwCreateWindowSurface(instance,window,nullptr,&surface)!=VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to create window surface!");
+		}
 	}
 
 	void createLogicalDevice()
@@ -341,6 +350,7 @@ private:
 		{
 			DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
 		}
+		vkDestroySurfaceKHR(instance, surface, nullptr);
 		vkDestroyInstance(instance, nullptr);
 		glfwDestroyWindow(window);
 		glfwTerminate();
