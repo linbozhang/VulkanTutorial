@@ -27,7 +27,7 @@ VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
 	VkDebugUtilsMessengerEXT* pDebugMessenger
 )
 {
-	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+	const auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT"));
 	if (func != nullptr)
 	{
 		return func(instance, pCreateinfo, pAllocator, pDebugMessenger);
@@ -41,7 +41,8 @@ VkResult CreateDebugUtilsMessengerEXT(VkInstance instance,
 void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT debugMessenger
 	, const VkAllocationCallbacks* pAllocator)
 {
-	auto func = (PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+	const auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT")
+	);
 	if (func != nullptr)
 	{
 		func(instance, debugMessenger, pAllocator);
@@ -61,12 +62,12 @@ public:
 		cleanup();
 	}
 private:
-	GLFWwindow* window;
-	VkInstance instance;
+	GLFWwindow* window = nullptr;
+	VkInstance instance = nullptr;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-	VkDevice device;
-	VkQueue graphicsQueue;
-	VkDebugUtilsMessengerEXT debugMessenger;
+	VkDevice logicalDevice = nullptr;
+	VkQueue graphicsQueue = nullptr;
+	VkDebugUtilsMessengerEXT debugMessenger = nullptr;
 
 
 	struct QueueFamilyIndices
@@ -114,7 +115,7 @@ private:
 			createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
 			createInfo.ppEnabledLayerNames = validationLayers.data();
 			populateDebugMessengerCreateInfo(debugCreateInfo);
-			createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
+			createInfo.pNext = static_cast<VkDebugUtilsMessengerCreateInfoEXT*>(&debugCreateInfo);
 		}
 		else
 		{
@@ -206,14 +207,14 @@ private:
 		createInfo.pEnabledFeatures = &deviceFeatures;
 
 		createInfo.enabledExtensionCount = 0;
-		if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device) != VK_SUCCESS)
+		if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &logicalDevice) != VK_SUCCESS)
 		{
 			throw std::runtime_error("failed to create logicaldevice");
 		}
-		vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
+		vkGetDeviceQueue(logicalDevice, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	}
 
-	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
+	QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice device)
 	{
 		QueueFamilyIndices indices;
 		/*std::optional<uint32_t> graphicsFamily;
@@ -335,7 +336,7 @@ private:
 
 	void cleanup()
 	{
-		vkDestroyDevice(device, nullptr);
+		vkDestroyDevice(logicalDevice, nullptr);
 		if (enableValidationLayers)
 		{
 			DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
