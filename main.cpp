@@ -63,6 +63,7 @@ private:
 	GLFWwindow* window;
 	VkInstance instance;
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+	VkDevice device;
 	VkDebugUtilsMessengerEXT debugMessenger;
 	
 	
@@ -179,6 +180,10 @@ private:
 		setupDebugMessenger();
 		pickPhysicalDevice();
 	}
+	void createLogicalDevice()
+	{
+		
+	}
 	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device)
 	{
 		QueueFamilyIndices indices;
@@ -242,7 +247,7 @@ private:
 	int rateDeviceSuitability(VkPhysicalDevice device)
 	{
 		int score = 0;
-		if(isDeviceSuitable(device))
+		if(!isDeviceSuitable(device))
 		{
 			return 0;
 		}
