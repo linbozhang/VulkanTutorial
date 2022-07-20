@@ -74,9 +74,13 @@ private:
 	VkQueue graphicsQueue = nullptr;
 	VkQueue presentQueue = nullptr;
 	VkSurfaceKHR surface;
-	VkSwapchainKHR swapChain;
+	
 	VkDebugUtilsMessengerEXT debugMessenger = nullptr;
 
+	VkSwapchainKHR swapChain;
+	std::vector<VkImage> swapChainImages;
+	VkFormat swapChainImageFormat;
+	VkExtent2D swapChainExtent;
 
 	struct QueueFamilyIndices
 	{
@@ -253,6 +257,12 @@ private:
 		{
 			throw std::runtime_error("failed to create swap chain!");
 		}
+		vkGetSwapchainImagesKHR(logicalDevice, swapChain, &imageCount, nullptr);
+		swapChainImages.resize(imageCount);
+		vkGetSwapchainImagesKHR(logicalDevice, swapChain, &imageCount, swapChainImages.data());
+
+		swapChainImageFormat = surfaceFormat.format;
+		swapChainExtent = extent;
 	}
 	void createSurface()
 	{
