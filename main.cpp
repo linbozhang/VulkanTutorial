@@ -85,6 +85,12 @@ private:
 			return graphicsFamily.has_value() && presentFamily.has_value();
 		}
 	};
+	struct SwapChainSupportDetails
+	{
+		VkSurfaceCapabilitiesKHR capabilities;
+		std::vector<VkSurfaceFormatKHR> formats;
+		std::vector<VkPresentModeKHR> presentModes;
+	};
 	void initWindow()
 	{
 		glfwInit();
@@ -238,6 +244,29 @@ private:
 		vkGetDeviceQueue(logicalDevice, indices.presentFamily.value(), 0, &presentQueue);
 	}
 
+	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device)
+	{
+		SwapChainSupportDetails details;
+		vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
+
+		uint32_t formatCount;
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+		if(formatCount!=0)
+		{
+			details.formats.resize(formatCount);
+			vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
+		}
+
+		uint32_t presentModeCount;
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
+		if(presentModeCount!=0)
+		{
+			details.presentModes.resize(presentModeCount);
+			vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
+		}
+		return details;
+	}
+
 	QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice device)
 	{
 		QueueFamilyIndices indices;
@@ -302,7 +331,15 @@ private:
 	{
 		QueueFamilyIndices indices = findQueueFamilies(device);
 		bool extensionSupported = checkDeviceExtensionSupport(device);
-		return indices.isComplete() && extensionSupported;
+
+		bool swapChainAdequate = false;
+		if(extensionSupported)
+		{
+			SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
+			swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
+		}
+		
+		return indices.isComplete() && extensionSupported && swapChainAdequate;
 	}
 
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device)
