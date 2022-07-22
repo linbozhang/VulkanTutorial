@@ -104,7 +104,8 @@ private:
 	VkPipeline graphicsPipeline;
 
 	std::vector<VkFramebuffer> swapChainFramebuffers;
-	
+	VkCommandPool commandPool;
+	std::vector<VkCommandBuffer> commandBuffers;
 
 	struct QueueFamilyIndices
 	{
@@ -142,6 +143,34 @@ private:
 		createRenderPass();
 		createGraphicsPipeline();
 		createFrameBuffers();
+		createCommandPool();
+		createCommandBuffers();
+	}
+	void createCommandBuffers()
+	{
+		commandBuffers.resize(swapChainFramebuffers.size());
+		VkCommandBufferAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+		allocInfo.commandPool = commandPool;
+		allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+		allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+		if(vkAllocateCommandBuffers(logicalDevice,&allocInfo,commandBuffers.data())!=VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to allocate command buffers");
+		}
+	}
+	void createCommandPool()
+	{
+		QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
+		VkCommandPoolCreateInfo poolInfo{};
+		poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+		poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
+		poolInfo.flags = 0;
+
+		if(vkCreateCommandPool(logicalDevice,&poolInfo,nullptr,&commandPool)!=VK_SUCCESS)
+		{
+			throw std::runtime_error("failed to create command pool!");
+		}
 	}
 	void createFrameBuffers()
 	{
@@ -805,6 +834,7 @@ private:
 
 	void cleanup()
 	{
+		vkDestroyCommandPool(logicalDevice, commandPool, nullptr);
 		for(auto framebuffer:swapChainFramebuffers)
 		{
 			vkDestroyFramebuffer(logicalDevice, framebuffer, nullptr);
