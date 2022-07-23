@@ -71,6 +71,7 @@ private:
 	void createImageViews();
 	void createSurface();
 	void createLogicalDevice();
+	void createSemaphores();
 	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 	QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice device);
 	void pickPhysicalDevice();
