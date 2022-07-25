@@ -33,25 +33,32 @@ public:
 private:
 	GLFWwindow* window = nullptr;
 	VkInstance instance = nullptr;
+	VkDebugUtilsMessengerEXT debugMessenger = nullptr;
+	VkSurfaceKHR surface;
+	
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 	VkDevice logicalDevice = nullptr;
+	
 	VkQueue graphicsQueue = nullptr;
 	VkQueue presentQueue = nullptr;
-	VkSurfaceKHR surface;
-	VkDebugUtilsMessengerEXT debugMessenger = nullptr;
+	
 	VkSwapchainKHR swapChain;
 	std::vector<VkImage> swapChainImages;
-	std::vector<VkImageView> swapChainImageViews;
 	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;
+	std::vector<VkImageView> swapChainImageViews;
+	std::vector<VkFramebuffer> swapChainFramebuffers;
+	
 	VkRenderPass renderPass;
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
-	std::vector<VkFramebuffer> swapChainFramebuffers;
+	
 	VkCommandPool commandPool;
-	std::vector<VkCommandBuffer> commandBuffers;
+	VkCommandBuffer commandBuffer;
 	VkSemaphore imageAvailableSemaphore;
 	VkSemaphore renderFinishedSemaphore;
+	VkFence inFlightFence;
+
 
 	void initWindow();
 	void initVulkan();
@@ -60,7 +67,7 @@ private:
 	void cleanup();
 	void createCommandBuffers();
 	void createCommandPool();
-	void createFrameBuffers();
+	void createFramebuffers();
 	void createInstance();
 	bool checkValidationLayerSupport();
 	VkShaderModule createShaderModule(const std::vector<char>& code);
@@ -71,7 +78,8 @@ private:
 	void createImageViews();
 	void createSurface();
 	void createLogicalDevice();
-	void createSemaphores();
+	void createSyncObjects();
+	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 	QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice device);
 	void pickPhysicalDevice();
