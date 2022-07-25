@@ -6,7 +6,9 @@ struct VertexOut
 };
 struct VertexInput
 {
-	uint vertexID:SV_VertexID;
+	//uint vertexID:SV_VertexID;
+	[[vk::location(0)]]float2 inPosition:Position;
+	[[vk::location(1)]]float3 inColor:Color;
 };
 
 VertexOut vs_main(VertexInput input)
@@ -24,8 +26,8 @@ VertexOut vs_main(VertexInput input)
 			min16float3(0, 0, 1)
 	};
 	VertexOut output = (VertexOut)0;
-	output.postionCS = float4(positions[input.vertexID], 0.5, 1);
-	output.color = colors[input.vertexID];
+	output.postionCS = float4(input.inPosition.xy, 0, 1);// float4(positions[input.vertexID], 0.5, 1);
+	output.color = input.inColor;// colors[input.vertexID];
 	return output;
 }
 

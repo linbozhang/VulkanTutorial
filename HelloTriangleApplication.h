@@ -59,6 +59,8 @@ private:
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
 	std::vector<VkFence> imagesInFlights;
+	VkBuffer vertexBuffer;
+	VkDeviceMemory vertexBufferMemory;
 	size_t currentFrame = 0;
 	bool framebufferResized = false;
 
@@ -72,7 +74,9 @@ private:
 	void createCommandPool();
 	void createFramebuffers();
 	void createInstance();
+	void createVertexBuffer();
 	bool checkValidationLayerSupport();
+	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 	void createRenderPass();
 	void createGraphicsPipeline();
