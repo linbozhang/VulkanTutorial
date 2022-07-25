@@ -54,10 +54,12 @@ private:
 	VkPipeline graphicsPipeline;
 	
 	VkCommandPool commandPool;
-	VkCommandBuffer commandBuffer;
-	VkSemaphore imageAvailableSemaphore;
-	VkSemaphore renderFinishedSemaphore;
-	VkFence inFlightFence;
+	std::vector<VkCommandBuffer> commandBuffers;
+	std::vector< VkSemaphore> imageAvailableSemaphores;
+	std::vector<VkSemaphore> renderFinishedSemaphores;
+	std::vector<VkFence> inFlightFences;
+	std::vector<VkFence> imagesInFlights;
+	size_t currentFrame = 0;
 
 
 	void initWindow();
