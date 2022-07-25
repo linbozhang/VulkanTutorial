@@ -58,8 +58,11 @@ static std::vector<char> readFile(const std::string& filename)
 }
 
 
-
-
+void HelloTriangleAppliaction::framebufferResizeCallback(GLFWwindow* window, int widht, int height)
+{
+	auto app = reinterpret_cast<HelloTriangleAppliaction*>(glfwGetWindowUserPointer(window));
+	app->framebufferResized = true;
+}
 
 void HelloTriangleAppliaction::run()
 {
@@ -73,8 +76,10 @@ void HelloTriangleAppliaction::initWindow()
 {
 	glfwInit();
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	//glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+	glfwSetWindowUserPointer(window, this);
+	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 void HelloTriangleAppliaction::initVulkan()
 {
@@ -217,6 +222,34 @@ void HelloTriangleAppliaction::createFramebuffers()
 		}
 	}
 }
+void HelloTriangleAppliaction::recreateSwapChain()
+{
+	vkDeviceWaitIdle(logicalDevice);
+
+	cleanupSwapChain();
+	createSwapChain();
+	createImageViews();
+	// createRenderPass(); has no format change so no need re create render pass 
+	//createGraphicsPipeline();  viewport and scissor no specified during graphics pipeline creation
+	createFramebuffers();
+	createCommandBuffers();
+}
+void HelloTriangleAppliaction::cleanupSwapChain()
+{
+	for(size_t i=0;i<swapChainFramebuffers.size();i++)
+	{
+		vkDestroyFramebuffer(logicalDevice, swapChainFramebuffers[i], nullptr);
+	}
+	vkFreeCommandBuffers(logicalDevice, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+	for(size_t i=0;i<swapChainImageViews.size();i++)
+	{
+		vkDestroyImageView(logicalDevice, swapChainImageViews[i], nullptr);
+	}
+	vkDestroySwapchainKHR(logicalDevice, swapChain, nullptr);
+}
+
+
+
 void HelloTriangleAppliaction::createInstance()
 {
 	if (enableValidationLayers && !checkValidationLayerSupport())
@@ -769,7 +802,9 @@ VkExtent2D HelloTriangleAppliaction::chooseSwapExtent(const VkSurfaceCapabilitie
 	}
 	else
 	{
-		VkExtent2D actualExtent = { WIDTH,HEIGHT };
+		int width, height;
+		glfwGetFramebufferSize(window, &width, &height);
+		VkExtent2D actualExtent = { width,height };
 		actualExtent.width = std::max(capabilities.minImageExtent.width, std::min(capabilities.maxImageExtent.width, actualExtent.width));
 		actualExtent.height = std::max(capabilities.minImageExtent.height, std::min(capabilities.maxImageExtent.height, actualExtent.height));
 		return actualExtent;
@@ -889,7 +924,15 @@ void HelloTriangleAppliaction::drawFrame()
 	vkWaitForFences(logicalDevice, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 	//vkResetFences(logicalDevice, 1, &inFlightFences[currentFrame]);
 	uint32_t imageIndex;
-	vkAcquireNextImageKHR(logicalDevice, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	VkResult result= vkAcquireNextImageKHR(logicalDevice, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	if(result== VK_ERROR_OUT_OF_DATE_KHR)
+	{
+		recreateSwapChain();
+		return;
+	}else if(result !=VK_SUCCESS && result!=VK_SUBOPTIMAL_KHR)
+	{
+		throw std::runtime_error("failed to acquire swap chain image!");
+	}
 	if(imagesInFlights[imageIndex]!=VK_NULL_HANDLE)
 	{
 		vkWaitForFences(logicalDevice, 1, &imagesInFlights[imageIndex], VK_TRUE, UINT64_MAX);
@@ -930,11 +973,20 @@ void HelloTriangleAppliaction::drawFrame()
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr;
 
-	vkQueuePresentKHR(presentQueue, &presentInfo);
+	result= vkQueuePresentKHR(presentQueue, &presentInfo);
+	if(result== VK_ERROR_OUT_OF_DATE_KHR || result== VK_SUBOPTIMAL_KHR || framebufferResized)
+	{
+		framebufferResized = false;
+		recreateSwapChain();
+	}else if(result!=VK_SUCCESS)
+	{
+		throw std::runtime_error("failed to present swap chain image!");
+	}
 	currentFrame = (currentFrame + 1) % MAX_FRAME_IN_FLIGHT;
 }
 void HelloTriangleAppliaction::cleanup()
 {
+	cleanupSwapChain();
 	for(size_t i=0;i<MAX_FRAME_IN_FLIGHT;i++)
 	{
 		vkDestroySemaphore(logicalDevice, renderFinishedSemaphores[i], nullptr);
@@ -943,18 +995,18 @@ void HelloTriangleAppliaction::cleanup()
 	}
 	
 	vkDestroyCommandPool(logicalDevice, commandPool, nullptr);
-	for (auto framebuffer : swapChainFramebuffers)
+	/*for (auto framebuffer : swapChainFramebuffers)
 	{
 		vkDestroyFramebuffer(logicalDevice, framebuffer, nullptr);
-	}
+	}*/
 	vkDestroyPipeline(logicalDevice, graphicsPipeline, nullptr);
 	vkDestroyPipelineLayout(logicalDevice, pipelineLayout, nullptr);
 	vkDestroyRenderPass(logicalDevice, renderPass, nullptr);
-	for (auto imageView : swapChainImageViews)
+	/*for (auto imageView : swapChainImageViews)
 	{
 		vkDestroyImageView(logicalDevice, imageView, nullptr);
-	}
-	vkDestroySwapchainKHR(logicalDevice, swapChain, nullptr);
+	}*/
+	//vkDestroySwapchainKHR(logicalDevice, swapChain, nullptr);
 	vkDestroyDevice(logicalDevice, nullptr);
 	if (enableValidationLayers)
 	{

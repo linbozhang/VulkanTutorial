@@ -60,6 +60,7 @@ private:
 	std::vector<VkFence> inFlightFences;
 	std::vector<VkFence> imagesInFlights;
 	size_t currentFrame = 0;
+	bool framebufferResized = false;
 
 
 	void initWindow();
@@ -82,6 +83,8 @@ private:
 	void createLogicalDevice();
 	void createSyncObjects();
 	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+	void recreateSwapChain();
+	void cleanupSwapChain();
 	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 	QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice device);
 	void pickPhysicalDevice();
@@ -107,4 +110,6 @@ private:
 
 		return VK_FALSE;
 	}
+
+	static void framebufferResizeCallback(GLFWwindow* window, int widht, int height);
 };
