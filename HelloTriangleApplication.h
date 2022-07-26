@@ -75,6 +75,7 @@ private:
 	void createFramebuffers();
 	void createInstance();
 	void createVertexBuffer();
+	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 	bool checkValidationLayerSupport();
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
