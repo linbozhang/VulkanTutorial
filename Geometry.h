@@ -1,8 +1,11 @@
 #pragma once
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <vector>
 #include <vulkan/vulkan_core.h>
 #include <array>
+#include <chrono>
 struct Vertex
 {
 	glm::vec2 pos;
@@ -41,5 +44,12 @@ const std::vector<Vertex> vertices = {
 };
 const std::vector<uint16_t> indices = {
 	0,1,2,0,2,3
+};
+
+struct UniformBufferObject
+{
+	glm::mat4 model;
+	glm::mat4 view;
+	glm::mat4 proj;
 };
 

@@ -10,7 +10,12 @@ struct VertexInput
 	[[vk::location(0)]]float2 inPosition:Position;
 	[[vk::location(1)]]float3 inColor:Color;
 };
-
+[[vk::binding(0, 0)]] cbuffer UniformBufferObject:register(b0)
+{
+	float4x4 model;
+	float4x4 view;
+	float4x4 proj;
+};
 VertexOut vs_main(VertexInput input)
 {
 	float2 positions[3] =
@@ -26,8 +31,8 @@ VertexOut vs_main(VertexInput input)
 			min16float3(0, 0, 1)
 	};
 	VertexOut output = (VertexOut)0;
-	output.postionCS = float4(input.inPosition.xy, 0, 1);// float4(positions[input.vertexID], 0.5, 1);
-	output.color = input.inColor;// colors[input.vertexID];
+	output.postionCS = mul(proj,mul(view,mul(model,float4(input.inPosition, 0.5, 1)))); //float4(input.inPosition.xy, 0, 1);// float4(positions[input.vertexID], 0.5, 1);
+	output.color = min16float3(input.inColor);// colors[input.vertexID];
 	return output;
 }
 

@@ -51,10 +51,13 @@ private:
 
 	VkRenderPass renderPass;
 	VkPipelineLayout pipelineLayout;
+	VkDescriptorSetLayout descriptorSetLayout;
 	VkPipeline graphicsPipeline;
 
 	VkCommandPool commandPool;
+	VkDescriptorPool descriptorPool;
 	std::vector<VkCommandBuffer> commandBuffers;
+	std::vector<VkDescriptorSet> descriptorSets;
 	std::vector< VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
@@ -63,8 +66,11 @@ private:
 	VkDeviceMemory vertexBufferMemory;
 	VkBuffer indexBuffer;
 	VkDeviceMemory indexBufferMemory;
+	std::vector<VkBuffer> uniformBuffers;
+	std::vector<VkDeviceMemory> uniformBuffersMemory;
 	size_t currentFrame = 0;
 	bool framebufferResized = false;
+	
 
 
 	void initWindow();
@@ -78,6 +84,7 @@ private:
 	void createLogicalDevice();
 	void createSyncObjects();
 	void createRenderPass();
+	void createDescriptorSetLayout();
 	void createGraphicsPipeline();
 	void createCommandBuffers();
 	void createCommandPool();
@@ -88,6 +95,10 @@ private:
 	void createInstance();
 	void createVertexBuffer();
 	void createIndexBuffer();
+	void createUniformBuffers();
+	void createDescriptorPool();
+	void createDescriptorSets();
+	void updateUniformBuffer(uint32_t currentImage);
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 	bool checkValidationLayerSupport();
