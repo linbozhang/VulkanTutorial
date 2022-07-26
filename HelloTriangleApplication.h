@@ -35,24 +35,24 @@ private:
 	VkInstance instance = nullptr;
 	VkDebugUtilsMessengerEXT debugMessenger = nullptr;
 	VkSurfaceKHR surface;
-	
+
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 	VkDevice logicalDevice = nullptr;
-	
+
 	VkQueue graphicsQueue = nullptr;
 	VkQueue presentQueue = nullptr;
-	
+
 	VkSwapchainKHR swapChain;
 	std::vector<VkImage> swapChainImages;
 	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;
 	std::vector<VkImageView> swapChainImageViews;
 	std::vector<VkFramebuffer> swapChainFramebuffers;
-	
+
 	VkRenderPass renderPass;
 	VkPipelineLayout pipelineLayout;
 	VkPipeline graphicsPipeline;
-	
+
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 	std::vector< VkSemaphore> imageAvailableSemaphores;
@@ -61,6 +61,8 @@ private:
 	std::vector<VkFence> imagesInFlights;
 	VkBuffer vertexBuffer;
 	VkDeviceMemory vertexBufferMemory;
+	VkBuffer indexBuffer;
+	VkDeviceMemory indexBufferMemory;
 	size_t currentFrame = 0;
 	bool framebufferResized = false;
 
@@ -70,27 +72,32 @@ private:
 	void mainLoop();
 	void drawFrame();
 	void cleanup();
-	void createCommandBuffers();
-	void createCommandPool();
-	void createFramebuffers();
-	void createInstance();
-	void createVertexBuffer();
-	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-	bool checkValidationLayerSupport();
-	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
-	VkShaderModule createShaderModule(const std::vector<char>& code);
-	void createRenderPass();
-	void createGraphicsPipeline();
-	std::vector<const char*> getRequiredExtensions();
 	void createSwapChain();
 	void createImageViews();
 	void createSurface();
 	void createLogicalDevice();
 	void createSyncObjects();
+	void createRenderPass();
+	void createGraphicsPipeline();
+	void createCommandBuffers();
+	void createCommandPool();
 	void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 	void recreateSwapChain();
+	void createFramebuffers();
 	void cleanupSwapChain();
+	void createInstance();
+	void createVertexBuffer();
+	void createIndexBuffer();
+	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+	bool checkValidationLayerSupport();
+	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+	VkShaderModule createShaderModule(const std::vector<char>& code);
+	
+	std::vector<const char*> getRequiredExtensions();
+	
+	
+	
 	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
 	QueueFamilyIndices findQueueFamilies(const VkPhysicalDevice device);
 	void pickPhysicalDevice();
