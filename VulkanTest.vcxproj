@@ -186,10 +186,14 @@ E:\workprogram\VulkanSDK1_3_216_0\Bin\dxc.exe -spirv -T ps_5_0 -E ps_main .\Vert
 E:\workprogram\VulkanSDK1_3_216_0\Bin\dxc.exe -spirv -T ps_5_0 -E ps_main .\Vertex.hlsl -Fo ..\x64\Debug\Shaders\frag.spv</Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">E:\workprogram\VulkanSDK1_3_216_0\Bin\dxc.exe -spirv -T vs_5_0 -E vs_main .\Vertex.hlsl -Fo ..\x64\Debug\Shaders\vert.spv
 E:\workprogram\VulkanSDK1_3_216_0\Bin\dxc.exe -spirv -T ps_5_0 -E ps_main .\Vertex.hlsl -Fo ..\x64\Debug\Shaders\frag.spv</Command>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DeploymentContent>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
